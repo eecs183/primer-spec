@@ -1,5 +1,3 @@
----
-
 {% comment %}
   1. Set the copyright_holder variable.
      - IF 'page.authors' (a YAML list) exists, join it into a sentence.

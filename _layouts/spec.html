@@ -186,6 +186,7 @@ version_string: v1.10
             {% endif %}
 
             <!-- SAB added -->
+            <hr>
             {% capture policy_content %}{% include course_policy.md %}{% endcapture %}
             {{ policy_content | markdownify }}
 
