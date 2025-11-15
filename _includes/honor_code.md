@@ -1,9 +1,7 @@
 
 ## Collaboration Policy and the Honor Code
 
-Course policies, including those on academic integrity, are in place to encourage an effective learning environment for you.
-
-You are encouraged to:
+Course policies, including those on academic integrity, are in place to encourage an effective learning environment for you. We want students to learn from and with each other, and we encourage you to collaborate. We also want to encourage you to reach out and get help when you need it. You are encouraged to:
 
 * Give or receive help in understanding course concepts covered in lecture or lab.
 * Practice and study with other students to prepare for assessments or exams.
@@ -11,11 +9,8 @@ You are encouraged to:
 * Discuss general design principles or ideas as they relate to projects.
 * Help others understand compiler errors or how to debug parts of their code.
 
-To clarify the last item, you are permitted to look at another student's code to help them
-understand what is going on with their code. **You are not allowed to tell them what to write
-for their code, and you are not allowed to copy their work to use in your own solution.**
-If you are at all unsure whether your collaboration is allowed, please contact the course staff via the admin form before you do anything. We will help you determine if what you're thinking of
-doing is in the spirit of collaboration for EECS 183.
+To clarify the last item, you are permitted to look at another student's code to help them understand what is going on with their code. **You are not allowed to tell them what to write
+for their code, and you are not allowed to copy their work to use in your own solution.** If you are at all unsure whether your collaboration is allowed, please contact the course staff via the admin form before you do anything. We will help you determine if what you're thinking of doing is in the spirit of collaboration for EECS 183.
 
 The following are considered Honor Code violations:
 
@@ -29,4 +24,4 @@ The following are considered Honor Code violations:
 
 > **WARNING:** Please be aware of the autograder's ability to detect cheating automatically.
 
-The full collaboration policy can be [found in the syllabus](https://eecs183.github.io/eecs183.org/resources.html).
+The full collaboration policy can be found in the [syllabus](https://eecs183.github.io/eecs183.org/resources.html).
