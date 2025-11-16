@@ -1,3 +1,9 @@
+This Jekyll theme is a fork from the [EECS 485 primer-spec](https://www.github.com/eecs485staff/primer-spec). That theme was forked in fall 2025, but shortly thereafter disconnected it from the EECS 485 spec to definitively prevent EECS 183-specific changes accidentally being PR'ed to the EECS 485 spec. This does complicate the receipt of updates from the 485 theme, but such updates seem rare anyway, and the benefits of having our own theme are significant.
+
+Please view the [EECS 183-specific theme features](https://eecs183.github.io/primer-spec). Furthermore, the original documentation for the EECS 485 primer spec is below.
+
+---
+
 <div align="center">
 	<img src="demo/logo-light.svg#gh-light-mode-only" alt="Primer Spec logo" width="250em" />
 	<img src="demo/logo-dark.svg#gh-dark-mode-only" alt="Primer Spec logo" width="250em" />
@@ -14,12 +20,6 @@
 </div>
 
 <br>
-
-This Jekyll theme is a fork from the [EECS 485 primer-spec](https://www.github.com/eecs485staff/primer-spec). That theme was forked in fall 2025, but shortly thereafter disconnected it from the EECS 485 spec to definitively prevent EECS 183-specific changes accidentally being PR'ed to the EECS 485 spec. This does complicate the receipt of updates from the 485 theme, but such updates seem rare anyway, and the benefits of having our own theme are significant.
-
-Please view the [EECS 183-specific theme features](specific_183.md). Furthermore, the original documentation for the EECS 485 primer spec is below.
-
----
 
 _Primer Spec is a Jekyll theme that makes long informative web pages (like project specifications!) easier to read. In addition to aesthetic styling, the theme generates a table of contents displayed in a sidebar. You can [preview the theme to see what it looks like](http://eecs485staff.github.io/primer-spec), or even [use it today](#usage)._
 
