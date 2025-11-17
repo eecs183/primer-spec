@@ -1,8 +1,6 @@
-This Jekyll theme is a fork from the [EECS 485 primer-spec](https://www.github.com/eecs485staff/primer-spec). That theme was forked in fall 2025, but shortly thereafter disconnected it from the EECS 485 spec to definitively prevent EECS 183-specific changes accidentally being PR'ed to the EECS 485 spec. This does complicate the receipt of updates from the 485 theme, but such updates seem rare anyway, and the benefits of having our own theme are significant.
-
 # EECS 183-specific Theme Features
 
-The 183-specific additions to the theme are intended to reduce / eliminate duplication of text. Certain common text is provided in Markdown in the `_includes` directory and should be edited there, rather than copied into multiple webpages directly. I prefer writing in Markdown rather than HTML, so I made a `_includes/render_markdown.html` file that we should be able to include in any context, to properly render any markdown file. For example, to display the partner policy (e.g., for projects 3 and 4):
+This Jekyll theme is a fork from the [EECS 485 primer-spec](https://www.github.com/eecs485staff/primer-spec). The 183-specific additions to the theme are intended to reduce / eliminate duplication of text. Certain common text is provided in Markdown in the `_includes` directory and should be edited there, rather than copied into multiple webpages directly. I prefer writing in Markdown rather than HTML, so I made a `_includes/render_markdown.html` file that we should be able to include in any context, to properly render any markdown file. For example, to display the partner policy (e.g., for projects 3 and 4):
 
 ``` liquid
 {% include render_markdown.html file="parter.md" %}
