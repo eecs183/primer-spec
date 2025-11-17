@@ -1,25 +1,32 @@
 This Jekyll theme is a fork from the [EECS 485 primer-spec](https://www.github.com/eecs485staff/primer-spec). That theme was forked in fall 2025, but shortly thereafter disconnected it from the EECS 485 spec to definitively prevent EECS 183-specific changes accidentally being PR'ed to the EECS 485 spec. This does complicate the receipt of updates from the 485 theme, but such updates seem rare anyway, and the benefits of having our own theme are significant.
 
-Please view the [EECS 183-specific theme features](https://eecs183.github.io/primer-spec). Furthermore, the original documentation for the EECS 485 primer spec is below.
+# EECS 183-specific Theme Features
+
+The 183-specific additions to the theme are intended to reduce / eliminate duplication of text. Certain common text is provided in Markdown in the `_includes` directory and should be edited there, rather than copied into multiple webpages directly. I prefer writing in Markdown rather than HTML, so I made a `_includes/render_markdown.html` file that we should be able to include in any context, to properly render any markdown file. For example, to display the partner policy (e.g., for projects 3 and 4):
+
+``` liquid
+{% include render_markdown.html file="parter.md" %}
+```
+
+In addition, `_includes/copyright.md` is loaded automatically on every page, as specified in `_layouts/spec.html`. You can pass "arguments" for the names that appear using the YAML front matter tags `authors` and `ta_authors`. Each takes a list. For example:
+
+``` yaml
+---
+layout: spec
+authors:
+  - Bill Arthur
+  - Steven Bogaerts
+ta_authors:
+  - Biff Pectorals
+  - Danny Deltoids
+---
+```
+
+Technically IAs and GSIs do "work for hire" and thus can't hold the copyright for items developed as part of their employment, hence the separate tag and wording.
+
+The original documentation for the EECS 485 primer spec is below.
 
 ---
-
-<div align="center">
-	<img src="demo/logo-light.svg#gh-light-mode-only" alt="Primer Spec logo" width="250em" />
-	<img src="demo/logo-dark.svg#gh-dark-mode-only" alt="Primer Spec logo" width="250em" />
-	<h1>Primer Spec</h1>
-	<p>
-		<b>A website theme for long informative web pages.</b>
-	</p>
-	<a href="https://github.com/eecs485staff/primer-spec/actions/workflows/cibuild.yml">
-	  <img src="https://github.com/eecs485staff/primer-spec/actions/workflows/cibuild.yml/badge.svg?branch=develop" alt="cibuild" />
-        </a>
-	<a href="https://preview.sesh.rs/previews/eecs485staff/primer-spec/develop-preview/">
-	  <img src="https://img.shields.io/badge/develop-preview-blue.svg" alt="Nightly Preview" />
-        </a>
-</div>
-
-<br>
 
 _Primer Spec is a Jekyll theme that makes long informative web pages (like project specifications!) easier to read. In addition to aesthetic styling, the theme generates a table of contents displayed in a sidebar. You can [preview the theme to see what it looks like](http://eecs485staff.github.io/primer-spec), or even [use it today](#usage)._
 
@@ -35,10 +42,11 @@ Primer Spec is built on top of the wonderful [Primer theme](https://github.com/p
 ## Contents
 <!-- prettier-ignore-end -->
 
-- [Usage](#usage)
-- [User Showcase](#user-showcase)
-- [Contributing](#contributing)
-- [Acknowledgements](#acknowledgements)
+- [EECS 183-specific Theme Features](#eecs-183-specific-theme-features)
+  - [Usage](#usage)
+  - [User Showcase](#user-showcase)
+  - [Contributing](#contributing)
+  - [Acknowledgements](#acknowledgements)
 
 ## Usage
 
