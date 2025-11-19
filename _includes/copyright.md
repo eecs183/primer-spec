@@ -1,4 +1,4 @@
-# Copyright and Academic Integrity
+## Copyright and Academic Integrity
 
 {% comment %}
   1. Set the copyright_holder variable.
