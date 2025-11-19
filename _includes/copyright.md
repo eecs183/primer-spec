@@ -1,3 +1,5 @@
+# Copyright and Academic Integrity
+
 {% comment %}
   1. Set the copyright_holder variable.
      - IF 'page.authors' (a YAML list) exists, join it into a sentence.
@@ -25,8 +27,6 @@ This work is licensed under a <a rel="license" href="http://creativecommons.org/
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
   <img alt="Creative Commons License" style="border-width:0; display: inline !important; margin: 0 !important;" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" />
 </a>
-
-# Academic Integrity & Copyright Policy
 
 **All materials provided for this course, including but not limited to labs, projects, notes, and starter code, are the copyrighted intellectual property of the author(s) listed in the copyright notice above.** While these materials are licensed for public non-commercial use, this license does not grant you permission to post or republish your **solutions** to these assignments.
 
