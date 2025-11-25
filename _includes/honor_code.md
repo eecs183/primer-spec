@@ -24,4 +24,4 @@ The following are considered Honor Code violations:
 
 > **WARNING:** Please be aware of the autograder's ability to detect cheating automatically.
 
-The full collaboration policy can be found in the [syllabus](https://eecs183.github.io/py183.org/resources.html).
+The full collaboration policy can be found in the [syllabus](https://eecs183.github.io/py183.org/resources/).
