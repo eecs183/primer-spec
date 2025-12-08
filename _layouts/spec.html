@@ -206,5 +206,56 @@ version_string: v1.10
             gtag('config', '{{ site.google_analytics }}');
         </script>
         {% endif %}
+
+        <!-- Fix lazy loading of images -->
+        <script>
+        /**
+         * THEME REPAIR SCRIPT
+         * This script runs repeatedly to catch images that the theme
+         * has hidden with a base64 placeholder and forces them to show.
+         */
+        (function() {
+        function fixImages() {
+            // Find all images that are currently showing the "transparent pixel" (base64)
+            var brokenImages = document.querySelectorAll('img[src^="data:image/gif;base64"]');
+            
+            brokenImages.forEach(function(img) {
+            // 1. Try to find the real URL in standard hidden attributes
+            var realUrl = img.getAttribute('data-src') || img.getAttribute('data-original');
+            
+            // 2. If we found a real URL, force the swap immediately
+            if (realUrl) {
+                img.src = realUrl;
+                img.removeAttribute('data-src'); // Prevent re-processing
+                img.classList.remove('lazy');    // Remove class that might hide it
+                img.style.opacity = 1;           // Force visibility
+            } else {
+                // 3. If no data-src exists, the theme might be using a class to trigger the load.
+                // We trigger a fake "scroll" event to wake up the theme's lazy loader.
+                window.dispatchEvent(new Event('scroll'));
+            }
+            });
+        }
+
+        // Run immediately
+        fixImages();
+
+        // Run whenever the user clicks (for your single-page-app navigation)
+        document.addEventListener('click', function() {
+            setTimeout(fixImages, 500); // Wait 500ms for the new page content to load
+            setTimeout(fixImages, 1000); // Check again at 1 second
+        });
+        
+        // Run on standard PJAX/Turbolinks events (if your theme uses them)
+        document.addEventListener('pjax:end', fixImages);
+        document.addEventListener('turbolinks:load', fixImages);
+        
+        // Safety net: Check every 2 seconds just in case
+        setInterval(fixImages, 2000);
+        })();
+        </script>
+
+
+
     </body>
 </html>
