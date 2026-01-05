@@ -41,6 +41,77 @@ version_string: v1.10
                 font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji" !important;
             }
         </style>
+        <script> <!-- Date logic -->
+            window.CourseConfig = {
+                // 1. Look for course_start in _config.yml
+                courseStart: "{{ site.course_start | default: '' }}",
+                
+                // 2. Look for simulated_date in _config.yml (for debugging)
+                simulatedDate: "{{ site.simulated_date | default: '' }}"
+            };
+
+            // Helper to parse dates strictly as local time (YYYY-MM-DD)
+            // This prevents 2026-01-07 from becoming Jan 6th due to timezone offsets
+            function getLocalYMD(dateString) {
+                if (!dateString) return null;
+                // Appending T00:00:00 forces local time parsing in most environments
+                return new Date(dateString + "T00:00:00");
+            }
+
+            document.addEventListener("DOMContentLoaded", function() {
+                // --- TIMED RELEASE LOGIC ---
+                
+                // 1. Check if this page has a release_day set (injected via Liquid)
+                // We use a data attribute on the body or main container to pass the page variable
+                const pageReleaseDay = "{{ page.release_day }}"; 
+                
+                if (pageReleaseDay && pageReleaseDay !== "") {
+                    const config = window.CourseConfig;
+                    
+                    if (!config.courseStart) {
+                        console.error("Page has release_day, but site.course_start is missing in _config.yml");
+                        return; 
+                    }
+
+                    const start = getLocalYMD(config.courseStart);
+                    let now = new Date();
+                    
+                    // Handle Debugging Date
+                    if (config.simulatedDate) {
+                        console.log("Debug Mode: Simulating date", config.simulatedDate);
+                        now = getLocalYMD(config.simulatedDate);
+                    }
+
+                    // Calculate Release Date
+                    const releaseDate = new Date(start);
+                    releaseDate.setDate(releaseDate.getDate() + parseInt(pageReleaseDay, 10));
+
+                    // Reset hours for clean day comparison
+                    now.setHours(0,0,0,0);
+                    releaseDate.setHours(0,0,0,0);
+
+                    if (now < releaseDate) {
+                        // DATE HAS NOT PASSED YET: HIDE CONTENT
+                        
+                        // 1. Hide the main content container. 
+                        // (Adjust '.markdown-body' to match your theme's specific content class)
+                        const contentDiv = document.querySelector('.markdown-body') || document.querySelector('#main-content');
+                        if (contentDiv) contentDiv.style.display = 'none';
+
+                        // 2. Inject the "Coming Soon" message
+                        const msg = document.createElement('div');
+                        msg.innerHTML = `
+                            <div style="text-align: center; padding: 50px 20px; background: #f6f8fa; border: 1px solid #e1e4e8; border-radius: 6px; margin-top: 2rem;">
+                                <h2 style="border-bottom: none; margin-bottom: 10px;">Coming Soon</h2>
+                                <p>This content will be released on <strong>${releaseDate.toDateString()}</strong>.</p>
+                            </div>
+                        `;
+                        // Append right after the header or where the content was
+                        if (contentDiv) contentDiv.parentNode.insertBefore(msg, contentDiv);
+                    }
+                }
+            });
+            </script>
         <script src="https://cdn.jsdelivr.net/npm/mermaid@9/dist/mermaid.min.js" crossorigin="anonymous" defer></script>
         {%- endif %}
 
