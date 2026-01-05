@@ -42,75 +42,89 @@ version_string: v1.10
             }
         </style>
         <script> <!-- Date logic -->
-            window.CourseConfig = {
-                // 1. Look for course_start in _config.yml
-                courseStart: "{{ site.course_start | default: '' }}",
-                
-                // 2. Look for simulated_date in _config.yml (for debugging)
-                simulatedDate: "{{ site.simulated_date | default: '' }}"
-            };
+            (function() {
+                // 1. CONFIGURATION
+                // Change this string every semester in the Theme to update ALL your sites.
+                // Child sites can override this by adding 'course_start' to their own _config.yml
+                const DEFAULT_COURSE_START = "2026-01-07"; 
 
-            // Helper to parse dates strictly as local time (YYYY-MM-DD)
-            // This prevents 2026-01-07 from becoming Jan 6th due to timezone offsets
-            function getLocalYMD(dateString) {
-                if (!dateString) return null;
-                // Appending T00:00:00 forces local time parsing in most environments
-                return new Date(dateString + "T00:00:00");
-            }
+                // Get values from Jekyll (Liquid)
+                // We use a specific namespace 'ThemeCourseConfig' to avoid breaking your existing announcements.html
+                window.ThemeCourseConfig = {
+                    courseStart: "{{ site.course_start | default: 'DEFAULT_COURSE_START' }}",
+                    simulatedDate: "{{ site.simulated_date | default: '' }}"
+                };
 
-            document.addEventListener("DOMContentLoaded", function() {
-                // --- TIMED RELEASE LOGIC ---
-                
-                // 1. Check if this page has a release_day set (injected via Liquid)
-                // We use a data attribute on the body or main container to pass the page variable
+                // Replace the placeholder if Liquid didn't find a site-specific variable
+                if (window.ThemeCourseConfig.courseStart === 'DEFAULT_COURSE_START') {
+                    window.ThemeCourseConfig.courseStart = DEFAULT_COURSE_START;
+                }
+
+                // Helper: Parse YYYY-MM-DD as local start-of-day
+                function getLocalYMD(dateString) {
+                    if (!dateString) return null;
+                    // Appending T00:00:00 forces most browsers to treat this as local time, not UTC
+                    return new Date(dateString + "T00:00:00");
+                }
+
+                // 2. MAIN LOGIC
+                // We run this immediately to hide content as fast as possible
                 const pageReleaseDay = "{{ page.release_day }}"; 
-                
+
                 if (pageReleaseDay && pageReleaseDay !== "") {
-                    const config = window.CourseConfig;
-                    
-                    if (!config.courseStart) {
-                        console.error("Page has release_day, but site.course_start is missing in _config.yml");
-                        return; 
-                    }
-
+                    const config = window.ThemeCourseConfig;
                     const start = getLocalYMD(config.courseStart);
-                    let now = new Date();
                     
-                    // Handle Debugging Date
-                    if (config.simulatedDate) {
-                        console.log("Debug Mode: Simulating date", config.simulatedDate);
-                        now = getLocalYMD(config.simulatedDate);
-                    }
-
-                    // Calculate Release Date
+                    // Calculate Target Release Date
                     const releaseDate = new Date(start);
                     releaseDate.setDate(releaseDate.getDate() + parseInt(pageReleaseDay, 10));
 
-                    // Reset hours for clean day comparison
+                    // Calculate "Now"
+                    let now = new Date();
+                    if (config.simulatedDate && config.simulatedDate.trim() !== "") {
+                        console.log("⚠️ DEBUG MODE: Simulating date", config.simulatedDate);
+                        now = getLocalYMD(config.simulatedDate);
+                    }
+
+                    // Normalize time to midnight for accurate day comparison
                     now.setHours(0,0,0,0);
                     releaseDate.setHours(0,0,0,0);
 
+                    // 3. CHECK: IS IT TIME?
                     if (now < releaseDate) {
-                        // DATE HAS NOT PASSED YET: HIDE CONTENT
+                        // Content is NOT ready yet.
                         
-                        // 1. Hide the main content container. 
-                        // (Adjust '.markdown-body' to match your theme's specific content class)
-                        const contentDiv = document.querySelector('.markdown-body') || document.querySelector('#main-content');
-                        if (contentDiv) contentDiv.style.display = 'none';
+                        // A. Hide the content
+                        // 'markdown-body' is the standard class in primer-spec. 
+                        // We use a CSS rule injection first to prevent "flashing" of content.
+                        const style = document.createElement('style');
+                        style.innerHTML = '.markdown-body { display: none !important; }';
+                        document.head.appendChild(style);
 
-                        // 2. Inject the "Coming Soon" message
-                        const msg = document.createElement('div');
-                        msg.innerHTML = `
-                            <div style="text-align: center; padding: 50px 20px; background: #f6f8fa; border: 1px solid #e1e4e8; border-radius: 6px; margin-top: 2rem;">
-                                <h2 style="border-bottom: none; margin-bottom: 10px;">Coming Soon</h2>
-                                <p>This content will be released on <strong>${releaseDate.toDateString()}</strong>.</p>
-                            </div>
-                        `;
-                        // Append right after the header or where the content was
-                        if (contentDiv) contentDiv.parentNode.insertBefore(msg, contentDiv);
+                        // B. Wait for DOM to allow inserting the message
+                        document.addEventListener("DOMContentLoaded", function() {
+                            const contentContainer = document.querySelector('.markdown-body') || document.body;
+                            
+                            // Create "Coming Soon" Banner
+                            const msg = document.createElement('div');
+                            msg.innerHTML = `
+                                <div style="text-align: center; padding: 60px 20px; background: #f6f8fa; border: 1px solid #e1e4e8; border-radius: 6px; margin: 2rem auto; max-width: 800px;">
+                                    <h2 style="border-bottom: none; margin-bottom: 10px; color: #24292e;">Coming Soon</h2>
+                                    <p style="font-size: 1.1em; color: #586069;">
+                                        Please check back later. This content will become available shortly before it is assigned.
+                                    </p>
+                                    <p style="font-size: 0.85em; color: #6a737d; margin-top: 20px;">
+                                        (Releases on ${releaseDate.toLocaleDateString()})
+                                    </p>
+                                </div>
+                            `;
+                            
+                            // Insert message before the hidden content
+                            contentContainer.parentNode.insertBefore(msg, contentContainer);
+                        });
                     }
                 }
-            });
+            })();
             </script>
         <script src="https://cdn.jsdelivr.net/npm/mermaid@9/dist/mermaid.min.js" crossorigin="anonymous" defer></script>
         {%- endif %}
