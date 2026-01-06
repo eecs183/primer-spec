@@ -68,67 +68,46 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 </script>
 <script> <!-- Enable date access for pages -->
-(function() {
-    // 1. CONFIGURATION
-    window.ThemeCourseConfig = {
-        courseStart: "{{ site.course_start | default: '2026-01-08' }}",
-        simulatedDate: "{{ site.simulated_date }}" 
-    };
+document.addEventListener("DOMContentLoaded", function() {
+  const locked = document.getElementById('release-locked');
+  const unlocked = document.getElementById('release-unlocked');
 
-    // 2. THE LOGIC FUNCTION
-    function applyTimedRelease() {
-        // Look for release offset in the YAML front matter (rendered by Jekyll)
-        // If not found, default to null so we don't hide things accidentally
-        const releaseOffset = "{{ page.release_day }}"; 
-        
-        const placeholder = document.getElementById('release-locked');
-        const content     = document.getElementById('release-unlocked');
-        
-        // If the divs aren't found, stop.
-        if (!placeholder || !content) return;
+  // Only run if the page has locked/unlocked divs
+  if (locked && unlocked) {
+    
+    // 1. Get Variables
+    const params = new URLSearchParams(window.location.search);
+    const isStaff = params.has('staff');
+    
+    // Get the release date from Jekyll Frontmatter (custom variable 'release')
+    const releaseDateStr = "{{ page.release | date: '%Y-%m-%d' }}";
+    
+    // 2. Logic
+    let isReleased = false;
 
-        console.log("🕒 Timed Release Checking...");
-
-        // Helper to parse "YYYY-MM-DD"
-        function getLocalYMD(dateString) {
-            if (!dateString) return null;
-            return new Date(dateString + "T00:00:00");
-        }
-
-        const start = getLocalYMD(window.ThemeCourseConfig.courseStart);
-        if (!start) return; // Safety check
-
-        const releaseDate = new Date(start);
-        releaseDate.setDate(releaseDate.getDate() + parseInt(releaseOffset, 10));
-
-        let now = new Date();
-        // Check for Simulated Date
-        if (window.ThemeCourseConfig.simulatedDate && window.ThemeCourseConfig.simulatedDate !== "") {
-            console.log("⚠️ DEBUG MODE: Simulating date", window.ThemeCourseConfig.simulatedDate);
-            now = getLocalYMD(window.ThemeCourseConfig.simulatedDate);
-        }
-
-        // Normalize times to midnight
-        now.setHours(0,0,0,0);
-        releaseDate.setHours(0,0,0,0);
-
-        // 3. THE DECISION
-        if (now < releaseDate) {
-            placeholder.style.display = 'block';
-            content.style.display = 'none';
-        } else {
-            placeholder.style.display = 'none';
-            content.style.display = 'block';
-        }
+    // Only try to calculate date if the string isn't empty
+    if (releaseDateStr && releaseDateStr.trim() !== "") {
+        // T00:00:00 forces it to use local time (midnight), not UTC
+        const releaseDate = new Date(releaseDateStr + "T00:00:00");
+        const now = new Date();
+        isReleased = (now >= releaseDate);
     }
 
-    // 3. EXECUTION
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', applyTimedRelease);
-    } else {
-        applyTimedRelease();
+    // 3. Apply Visibility
+    if (isStaff || isReleased) {
+      // FORCE OPEN using CSS (Overrides any other theme defaults)
+      const style = document.createElement('style');
+      style.innerHTML = `
+        #release-locked { display: none !important; }
+        #release-unlocked { display: block !important; }
+      `;
+      document.head.appendChild(style);
+      
+      const reason = isStaff ? "Staff Override" : "Date Passed";
+      console.log(`State: Unlocked (${reason})`);
     }
-})();
+  }
+});
 </script>
 
         <!--
