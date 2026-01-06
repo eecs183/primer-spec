@@ -73,7 +73,6 @@ document.addEventListener("DOMContentLoaded", function() {
   const params = new URLSearchParams(window.location.search);
   const isStaff = params.has('staff');
   
-  // Get Dates from Jekyll
   const releaseDateStr = "{{ page.release | date: '%Y-%m-%d' }}";
   const simDateStr = "{{ site.simulated_date }}";
   
@@ -93,38 +92,45 @@ document.addEventListener("DOMContentLoaded", function() {
       isReleased = (now >= releaseDate);
   }
 
-  // 4. ACTION: HANDLE SIDEBAR (The Spoiler Fix)
-  // If it is NOT staff and NOT released, we disable the sidebar 
-  // so the TOC doesn't generate spoilers.
-  if (!isStaff && !isReleased) {
-      if (window.PrimerSpecConfig) {
-          window.PrimerSpecConfig.disableSidebar = true;
+  // 4. ACTION: HANDLE VISIBILITY
+  // We use a CSS style injection because it is faster than waiting for DOMContentLoaded,
+  // preventing the content from "flashing" before being hidden.
+  
+  const style = document.createElement('style');
+  document.head.appendChild(style);
+
+  if (isStaff || isReleased) {
+    // === UNLOCKED STATE ===
+    style.innerHTML = `
+      #release-locked { display: none !important; }
+      #release-unlocked { display: block !important; }
+    `;
+    const reason = isStaff ? "Staff Override" : `${mode} Passed`;
+    console.log(`State: Unlocked (${reason})`);
+    
+  } else {
+    // === LOCKED STATE ===
+    // 1. Show the "Locked" message
+    // 2. Hide the actual content
+    // 3. HIDE THE SIDEBAR (Prevents TOC spoilers)
+    // 4. Expand the main container to fill the empty space
+    style.innerHTML = `
+      #release-locked { display: block !important; }
+      #release-unlocked { display: none !important; }
+      
+      /* Hide the sidebar to prevent spoilers */
+      .s-sidebar, .sidebar, #sidebar { display: none !important; }
+      
+      /* Optional: Center the locked message since sidebar is gone */
+      .s-content, .main-content { 
+          margin-left: 0 !important; 
+          width: 100% !important; 
+          max-width: 800px !important;
+          margin: 0 auto !important;
       }
+    `;
+    console.log(`State: Locked (Waiting for ${releaseDateStr})`);
   }
-
-  // 5. ACTION: HANDLE CONTENT VISIBILITY (DOM Manipulation)
-  // We use DOMContentLoaded for this part to ensure divs exist
-  document.addEventListener("DOMContentLoaded", function() {
-    const locked = document.getElementById('release-locked');
-    const unlocked = document.getElementById('release-unlocked');
-
-    if (locked && unlocked) {
-      if (isStaff || isReleased) {
-        // FORCE OPEN using CSS
-        const style = document.createElement('style');
-        style.innerHTML = `
-          #release-locked { display: none !important; }
-          #release-unlocked { display: block !important; }
-        `;
-        document.head.appendChild(style);
-        
-        const reason = isStaff ? "Staff Override" : `${mode} Passed`;
-        console.log(`State: Unlocked (${reason})`);
-      } else {
-        console.log(`State: Locked (Waiting for ${releaseDateStr})`);
-      }
-    }
-  });
 
 })();
 </script>
