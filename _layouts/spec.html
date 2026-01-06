@@ -41,58 +41,66 @@ version_string: v1.10
                 font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji" !important;
             }
         </style>
-<script> <!-- Date logic -->
+<script>
 (function() {
-    const DEFAULT_COURSE_START = "2026-01-07"; 
-
+    // 1. CONFIGURATION
     window.ThemeCourseConfig = {
-        courseStart: "{{ site.course_start | default: 'DEFAULT_COURSE_START' }}",
-        simulatedDate: "{{ site.simulated_date | default: '' }}"
+        courseStart: "{{ site.course_start | default: '2026-01-07' }}",
+        simulatedDate: "{{ site.simulated_date }}" 
     };
-    
-    if (window.ThemeCourseConfig.courseStart === 'DEFAULT_COURSE_START') {
-        window.ThemeCourseConfig.courseStart = DEFAULT_COURSE_START;
-    }
 
-    function getLocalYMD(dateString) {
-        if (!dateString) return null;
-        return new Date(dateString + "T00:00:00");
-    }
-
-    // Run immediately
-    const releaseOffset = "{{ page.release_day }}"; 
-    
-    // Only run if we have a release_day AND the special containers exist
-    if (releaseOffset && releaseOffset !== "") {
+    // 2. THE LOGIC FUNCTION
+    function applyTimedRelease() {
+        // Look for release offset in the YAML front matter (rendered by Jekyll)
+        // If not found, default to null so we don't hide things accidentally
+        const releaseOffset = "{{ page.release_day }}"; 
+        
         const placeholder = document.getElementById('release-locked');
         const content     = document.getElementById('release-unlocked');
         
-        if (placeholder || content) {
-            const config = window.ThemeCourseConfig;
-            const start = getLocalYMD(config.courseStart);
-            const releaseDate = new Date(start);
-            releaseDate.setDate(releaseDate.getDate() + parseInt(releaseOffset, 10));
+        // If the divs aren't found, stop.
+        if (!placeholder || !content) return;
 
-            let now = new Date();
-            if (config.simulatedDate && config.simulatedDate.trim() !== "") {
-                console.log("Debug Mode:", config.simulatedDate);
-                now = getLocalYMD(config.simulatedDate);
-            }
+        console.log("🕒 Timed Release Checking...");
 
-            now.setHours(0,0,0,0);
-            releaseDate.setHours(0,0,0,0);
-
-            // LOGIC:
-            if (now < releaseDate) {
-                // LOCKED: Show placeholder, hide content
-                if (placeholder) placeholder.style.display = 'block';
-                if (content)     content.style.display = 'none';
-            } else {
-                // UNLOCKED: Hide placeholder, show content
-                if (placeholder) placeholder.style.display = 'none';
-                if (content)     content.style.display = 'block';
-            }
+        // Helper to parse "YYYY-MM-DD"
+        function getLocalYMD(dateString) {
+            if (!dateString) return null;
+            return new Date(dateString + "T00:00:00");
         }
+
+        const start = getLocalYMD(window.ThemeCourseConfig.courseStart);
+        if (!start) return; // Safety check
+
+        const releaseDate = new Date(start);
+        releaseDate.setDate(releaseDate.getDate() + parseInt(releaseOffset, 10));
+
+        let now = new Date();
+        // Check for Simulated Date
+        if (window.ThemeCourseConfig.simulatedDate && window.ThemeCourseConfig.simulatedDate !== "") {
+            console.log("⚠️ DEBUG MODE: Simulating date", window.ThemeCourseConfig.simulatedDate);
+            now = getLocalYMD(window.ThemeCourseConfig.simulatedDate);
+        }
+
+        // Normalize times to midnight
+        now.setHours(0,0,0,0);
+        releaseDate.setHours(0,0,0,0);
+
+        // 3. THE DECISION
+        if (now < releaseDate) {
+            placeholder.style.display = 'block';
+            content.style.display = 'none';
+        } else {
+            placeholder.style.display = 'none';
+            content.style.display = 'block';
+        }
+    }
+
+    // 3. EXECUTION
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', applyTimedRelease);
+    } else {
+        applyTimedRelease();
     }
 })();
 </script>
