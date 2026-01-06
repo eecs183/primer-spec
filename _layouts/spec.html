@@ -93,9 +93,6 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   // 4. ACTION: HANDLE VISIBILITY
-  // We use a CSS style injection because it is faster than waiting for DOMContentLoaded,
-  // preventing the content from "flashing" before being hidden.
-  
   const style = document.createElement('style');
   document.head.appendChild(style);
 
@@ -110,21 +107,24 @@ document.addEventListener("DOMContentLoaded", function() {
     
   } else {
     // === LOCKED STATE ===
-    // 1. Show the "Locked" message
-    // 2. Hide the actual content
-    // 3. HIDE THE SIDEBAR (Prevents TOC spoilers)
-    // 4. Expand the main container to fill the empty space
     style.innerHTML = `
-      #release-locked { display: block !important; }
+      /* 1. Show the "Locked" message */
+      #release-locked { 
+          display: block !important; 
+          text-align: center; 
+          padding-top: 50px;
+      }
+      
+      /* 2. Hide the actual content */
       #release-unlocked { display: none !important; }
       
-      /* Hide the sidebar to prevent spoilers */
-      .s-sidebar, .sidebar, #sidebar { display: none !important; }
+      /*
+       3. HIDE THE SIDEBAR (Crucial for spoilers) */
+      .primer-spec-sidebar { display: none !important; }
       
-      /* Optional: Center the locked message since sidebar is gone */
-      .s-content, .main-content { 
-          margin-left: 0 !important; 
-          width: 100% !important; 
+      /* 4. Reset layout (optional but looks nicer) */
+      /* This attempts to center the locked message since the sidebar is gone */
+      .container-lg, .markdown-body {
           max-width: 800px !important;
           margin: 0 auto !important;
       }
