@@ -111,19 +111,17 @@ document.addEventListener("DOMContentLoaded", function() {
       /* 1. Show the "Locked" message */
       #release-locked { 
           display: block !important; 
-          text-align: center; 
           padding-top: 50px;
+          /* Removed text-align: center so it stays left-aligned */
       }
       
       /* 2. Hide the actual content */
       #release-unlocked { display: none !important; }
       
-      /*
-       3. HIDE THE SIDEBAR (Crucial for spoilers) */
+      /* 3. HIDE THE SIDEBAR */
       .primer-spec-sidebar { display: none !important; }
       
-      /* 4. Reset layout (optional but looks nicer) */
-      /* This attempts to center the locked message since the sidebar is gone */
+      /* 4. Center the container on the screen (but keep text left-aligned) */
       .container-lg, .markdown-body {
           max-width: 800px !important;
           margin: 0 auto !important;
