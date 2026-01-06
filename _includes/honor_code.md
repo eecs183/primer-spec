@@ -1,6 +1,6 @@
 ## Collaboration Policy and the Honor Code
 
-All students in the class are presumed to be decent and honorable, and all students in the class are bound by the [College of Engineering Honor Code](https://bulletin.engin.umich.edu/rules/). The full collaboration policy can be found in the [syllabus](https://eecs183.github.io/py183.org/resources/).
+All students in the class are presumed to be decent and honorable, and all students in the class are bound by the [College of Engineering Honor Code](https://bulletin.engin.umich.edu/rules/). The full collaboration policy can be found in the [syllabus](https://eecs183.github.io/py183.org/syllabus/).
 
 Course policies, including those on academic integrity, are in place to encourage an effective learning environment for you. We want students to learn from and with each other, and we encourage you to collaborate. We also want to encourage you to reach out and get help when you need it.
 
