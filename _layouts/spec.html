@@ -67,62 +67,66 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 });
 </script>
-<script> <!-- Enable date access for pages -->
-document.addEventListener("DOMContentLoaded", function() {
-  const locked = document.getElementById('release-locked');
-  const unlocked = document.getElementById('release-unlocked');
+<script> <!-- Enable date-based access for pages -->
+(function() {
+  // 1. GATHER INPUTS
+  const params = new URLSearchParams(window.location.search);
+  const isStaff = params.has('staff');
+  
+  // Get Dates from Jekyll
+  const releaseDateStr = "{{ page.release | date: '%Y-%m-%d' }}";
+  const simDateStr = "{{ site.simulated_date }}";
+  
+  // 2. DETERMINE "NOW"
+  let now = new Date();
+  let mode = "Real Date";
 
-  // Only run if the page has locked/unlocked divs
-  if (locked && unlocked) {
-    
-    // 1. Get Query Params (Staff Override)
-    const params = new URLSearchParams(window.location.search);
-    const isStaff = params.has('staff');
-    
-    // 2. Get Dates from Jekyll
-    // 'release' comes from the Page Frontmatter
-    // 'simulated' comes from _config.yml
-    const releaseDateStr = "{{ page.release | date: '%Y-%m-%d' }}";
-    const simDateStr = "{{ site.simulated_date }}";
-    
-    // 3. Determine "Current" Time
-    let now = new Date(); // Default to real real-time
-    let mode = "Real Date";
-
-    // If a simulated date is set in _config.yml, use that instead
-    if (simDateStr && simDateStr.trim() !== "") {
-        // T00:00:00 forces local midnight
-        now = new Date(simDateStr + "T00:00:00"); 
-        mode = "Simulated Date";
-        console.log(`⚠️ DEBUG: Simulating date ${simDateStr}`);
-    }
-
-    // 4. Compare Dates
-    let isReleased = false;
-    if (releaseDateStr && releaseDateStr.trim() !== "") {
-        const releaseDate = new Date(releaseDateStr + "T00:00:00");
-        
-        // Check if "Now" (real or simulated) is past the release date
-        isReleased = (now >= releaseDate);
-    }
-
-    // 5. Apply Visibility (Staff Override wins over everything)
-    if (isStaff || isReleased) {
-      // FORCE OPEN using CSS
-      const style = document.createElement('style');
-      style.innerHTML = `
-        #release-locked { display: none !important; }
-        #release-unlocked { display: block !important; }
-      `;
-      document.head.appendChild(style);
-      
-      const reason = isStaff ? "Staff Override" : `${mode} Passed`;
-      console.log(`State: Unlocked (${reason})`);
-    } else {
-      console.log(`State: Locked (Waiting for ${releaseDateStr})`);
-    }
+  if (simDateStr && simDateStr.trim() !== "") {
+      now = new Date(simDateStr + "T00:00:00"); 
+      mode = "Simulated Date";
   }
-});
+
+  // 3. DETERMINE IF RELEASED
+  let isReleased = false;
+  if (releaseDateStr && releaseDateStr.trim() !== "") {
+      const releaseDate = new Date(releaseDateStr + "T00:00:00");
+      isReleased = (now >= releaseDate);
+  }
+
+  // 4. ACTION: HANDLE SIDEBAR (The Spoiler Fix)
+  // If it is NOT staff and NOT released, we disable the sidebar 
+  // so the TOC doesn't generate spoilers.
+  if (!isStaff && !isReleased) {
+      if (window.PrimerSpecConfig) {
+          window.PrimerSpecConfig.disableSidebar = true;
+      }
+  }
+
+  // 5. ACTION: HANDLE CONTENT VISIBILITY (DOM Manipulation)
+  // We use DOMContentLoaded for this part to ensure divs exist
+  document.addEventListener("DOMContentLoaded", function() {
+    const locked = document.getElementById('release-locked');
+    const unlocked = document.getElementById('release-unlocked');
+
+    if (locked && unlocked) {
+      if (isStaff || isReleased) {
+        // FORCE OPEN using CSS
+        const style = document.createElement('style');
+        style.innerHTML = `
+          #release-locked { display: none !important; }
+          #release-unlocked { display: block !important; }
+        `;
+        document.head.appendChild(style);
+        
+        const reason = isStaff ? "Staff Override" : `${mode} Passed`;
+        console.log(`State: Unlocked (${reason})`);
+      } else {
+        console.log(`State: Locked (Waiting for ${releaseDateStr})`);
+      }
+    }
+  });
+
+})();
 </script>
 
         <!--
