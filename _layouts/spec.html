@@ -86,7 +86,11 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   // 3. DETERMINE IF RELEASED
-  let isReleased = false;
+  // FIX: Default to TRUE (Unlocked). 
+  // If a page has no 'release' date, it should be visible to everyone.
+  let isReleased = true; 
+
+  // Only apply locking logic if a date is actually specified
   if (releaseDateStr && releaseDateStr.trim() !== "") {
       const releaseDate = new Date(releaseDateStr + "T00:00:00");
       isReleased = (now >= releaseDate);
@@ -97,13 +101,14 @@ document.addEventListener("DOMContentLoaded", function() {
   document.head.appendChild(style);
 
   if (isStaff || isReleased) {
-    // === UNLOCKED STATE ===
+    // === UNLOCKED STATE (or Regular Page) ===
     style.innerHTML = `
       #release-locked { display: none !important; }
       #release-unlocked { display: block !important; }
     `;
-    const reason = isStaff ? "Staff Override" : `${mode} Passed`;
-    console.log(`State: Unlocked (${reason})`);
+    if (releaseDateStr) {
+        console.log(`State: Unlocked (${isStaff ? "Staff" : "Date Passed"})`);
+    }
     
   } else {
     // === LOCKED STATE ===
@@ -112,7 +117,6 @@ document.addEventListener("DOMContentLoaded", function() {
       #release-locked { 
           display: block !important; 
           padding-top: 50px;
-          /* Removed text-align: center so it stays left-aligned */
       }
       
       /* 2. Hide the actual content */
@@ -121,7 +125,7 @@ document.addEventListener("DOMContentLoaded", function() {
       /* 3. HIDE THE SIDEBAR */
       .primer-spec-sidebar { display: none !important; }
       
-      /* 4. Center the container on the screen (but keep text left-aligned) */
+      /* 4. Center the container */
       .container-lg, .markdown-body {
           max-width: 800px !important;
           margin: 0 auto !important;
