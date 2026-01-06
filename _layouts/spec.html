@@ -73,7 +73,6 @@ document.addEventListener("DOMContentLoaded", function() {
   const params = new URLSearchParams(window.location.search);
   const isStaff = params.has('staff');
   
-  // Get Dates from Jekyll
   const releaseDateStr = "{{ page.release | date: '%Y-%m-%d' }}";
   const simDateStr = "{{ site.simulated_date }}";
   
@@ -93,38 +92,45 @@ document.addEventListener("DOMContentLoaded", function() {
       isReleased = (now >= releaseDate);
   }
 
-  // 4. ACTION: HANDLE SIDEBAR (The Spoiler Fix)
-  // If it is NOT staff and NOT released, we disable the sidebar 
-  // so the TOC doesn't generate spoilers.
-  if (!isStaff && !isReleased) {
-      if (window.PrimerSpecConfig) {
-          window.PrimerSpecConfig.disableSidebar = true;
+  // 4. ACTION: HANDLE VISIBILITY
+  const style = document.createElement('style');
+  document.head.appendChild(style);
+
+  if (isStaff || isReleased) {
+    // === UNLOCKED STATE ===
+    style.innerHTML = `
+      #release-locked { display: none !important; }
+      #release-unlocked { display: block !important; }
+    `;
+    const reason = isStaff ? "Staff Override" : `${mode} Passed`;
+    console.log(`State: Unlocked (${reason})`);
+    
+  } else {
+    // === LOCKED STATE ===
+    style.innerHTML = `
+      /* 1. Show the "Locked" message */
+      #release-locked { 
+          display: block !important; 
+          text-align: center; 
+          padding-top: 50px;
       }
+      
+      /* 2. Hide the actual content */
+      #release-unlocked { display: none !important; }
+      
+      /*
+       3. HIDE THE SIDEBAR (Crucial for spoilers) */
+      .primer-spec-sidebar { display: none !important; }
+      
+      /* 4. Reset layout (optional but looks nicer) */
+      /* This attempts to center the locked message since the sidebar is gone */
+      .container-lg, .markdown-body {
+          max-width: 800px !important;
+          margin: 0 auto !important;
+      }
+    `;
+    console.log(`State: Locked (Waiting for ${releaseDateStr})`);
   }
-
-  // 5. ACTION: HANDLE CONTENT VISIBILITY (DOM Manipulation)
-  // We use DOMContentLoaded for this part to ensure divs exist
-  document.addEventListener("DOMContentLoaded", function() {
-    const locked = document.getElementById('release-locked');
-    const unlocked = document.getElementById('release-unlocked');
-
-    if (locked && unlocked) {
-      if (isStaff || isReleased) {
-        // FORCE OPEN using CSS
-        const style = document.createElement('style');
-        style.innerHTML = `
-          #release-locked { display: none !important; }
-          #release-unlocked { display: block !important; }
-        `;
-        document.head.appendChild(style);
-        
-        const reason = isStaff ? "Staff Override" : `${mode} Passed`;
-        console.log(`State: Unlocked (${reason})`);
-      } else {
-        console.log(`State: Locked (Waiting for ${releaseDateStr})`);
-      }
-    }
-  });
 
 })();
 </script>
