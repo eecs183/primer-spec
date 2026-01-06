@@ -47,34 +47,27 @@ version_string: v1.10
 
 <script> <!-- Enable immediate release of a locked page for staff when using ?staff=1 -->
 document.addEventListener("DOMContentLoaded", function() {
-  const locked = document.getElementById('release-locked');
-  const unlocked = document.getElementById('release-unlocked');
-
-  // SAFETY CHECK: Only run if this page actually has locked content
-  if (locked && unlocked) {
+  // Check if ?staff=1 is in the URL
+  const params = new URLSearchParams(window.location.search);
+  
+  if (params.has('staff')) {
+    // We create a new <style> tag
+    const style = document.createElement('style');
     
-    // 1. Check URL for ?staff=1
-    const params = new URLSearchParams(window.location.search);
-    const isStaff = params.has('staff');
-
-    // 2. Check Date (Liquid runs on the server and hardcodes true/false here)
-    // We use a fallback so it defaults to 'false' (locked) if no date is set
-    {% assign now_ts = site.time | date: "%s" %}
-    {% if page.date %}
-      {% assign release_ts = page.date | date: "%s" %}
-      const isReleased = {{ now_ts }} >= {{ release_ts }};
-    {% else %}
-      const isReleased = false; 
-    {% endif %}
-
-    // 3. Toggle Logic
-    if (isStaff || isReleased) {
-      locked.style.display = 'none';
-      unlocked.style.display = 'block';
-    }
+    // We write CSS rules with !important to OVERRIDE the theme's logic
+    style.innerHTML = `
+      #release-locked { display: none !important; }
+      #release-unlocked { display: block !important; }
+    `;
+    
+    // Append it to the document head
+    document.head.appendChild(style);
+    
+    console.log("Staff Mode: Access Granted via CSS Override");
   }
 });
-</script><script> <!-- Enable date access for pages -->
+</script>
+<script> <!-- Enable date access for pages -->
 (function() {
     // 1. CONFIGURATION
     window.ThemeCourseConfig = {
